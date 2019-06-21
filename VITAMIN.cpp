@@ -1,71 +1,55 @@
 #include <iostream>
+#include <cstring>
 #include <fstream>
 using namespace std;
-int n,x,i,j,u,c;
-long long int s[101],f[101][1000001];
+int n,x,i,j;
+int a[101],res,T[101][1000002];
 int main()
 {
-    ifstream fi ("VITAMIN.inp");
+    ifstream fi ("vitamin.inp");
+    ofstream fo ("vitamin.out");
     fi >>n>>x;
     for (i=1; i<=n; i++)
     {
-        cin >>c;
-        s[i]=s[i-1]+c;
+        fi >>a[i];
     }
-    u=1;
-    for (i=1; i<=x; i++)
-    {
-        if (i%s[1]==0)
-            f[1][i]=u,u+=2;
-    }
-    u=c;
-    int w=s[n]+u;
-    for (i=2; i<=n; i++)
-    {
-        for (j=1; j<=x; j++)
-        {
-            if (i!=n)
-            {
-                if (j<s[i])
-                    f[i][j]=f[i-1][j];
-                if (j==s[i])
-                    f[i][j]=i;
-                if (j>s[i])
-                {
-                    if (j%s[i]==0) f[i][j]=f[i][j-s[i]]+i+1;
-                    else if (f[i-1][j-s[i]]!=0) f[i][j]=f[i-1][j-s[i]]+i+1;
-                }
-            }
-            if (i==n){
-                if (j<s[i]) f[i][j]=f[i-1][j];
-                if (j==s[i]) f[i][j]=i;
-                if (j>s[i]){
-                    if (j%w==0) f[i][j]=f[i][j-u]+1;
-                    else{
-                        if (f[i-1][j-s[i]]!=0) f[i][j]=f[i-1][j-s[i]]+i+1;
-                    }
-                }
-            }
-        }
-    }
-    ofstream fo ("VITAMIN.out");
-    /*for (i=1; i<=n; i++)
-    {
-        for (j=1; j<=x; j++)
-            cout <<f[i][j]<<" ";
-        cout <<endl;
-    }*/
-    long long int res=1e18;
-    for (i=1; i<=n; i++)
-    {
-        if (f[i][x]!=0)
-        {
-            res=min(res,f[i][x]);
-        }
-    }
-    if (res==1e18)
-        fo <<-1;
+    if (n==1)
+        if (x%a[1]==0)
+            fo <<x/a[1];
+        else
+            fo <<-1;
     else
-        fo <<res;
+    {
+        for (i=0; i<n; i++)
+        {
+            for (j=0; j<=x; j++)
+                T[i][j]=1e8;
+        }
+        T[0][x]=0;
+        for (j=x; j>=0; j--)
+        {
+            for (i=0; i<n; i++)
+            {
+                if (j-a[i+1]>=0)
+                {
+
+                    T[min(i+1,n-1)][j-a[i+1]]=min(T[min(i+1,n-1)][j-a[i+1]],T[i][j]+1);
+                }
+                if (j-a[1]>=0)
+                {
+                    T[1][j-a[1]]=min(T[1][j-a[1]],T[i][j]+2);
+                }
+            }
+        }
+        res=1e8;
+        for (i=0; i<n; i++)
+        {
+            res=min(res,T[i][0]);
+        }
+        if (res!=1e8)
+            fo <<res;
+        else
+            fo <<-1;
+    }
     return 0;
 }
